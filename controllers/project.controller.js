@@ -83,7 +83,6 @@ const updateProject = async (req, res) => {
 const getProjectById = async (req, res) => {
   try {
     const { id } = req.params; // Lấy ID từ tham số URL
-    console.log("getProjectById", id);
 
     // Kiểm tra ID có đúng chuẩn Mongo ObjectId không
     if (!mongoose.Types.ObjectId.isValid(id)) {

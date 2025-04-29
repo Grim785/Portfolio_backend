@@ -7,7 +7,6 @@ const User = require('../models/user.model');
 const loginAdmin = async (req, res) => {
   try {
     const { username, password } = req.body;
-    console.log('Login request:', req.body);
 
     // Kiểm tra input
     if (!username || !password) {
@@ -23,7 +22,6 @@ const loginAdmin = async (req, res) => {
     // So sánh mật khẩu
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      console.log('here');
       return res.status(400).json({ message: 'Sai mật khẩu.' });
     }
 
