@@ -55,7 +55,15 @@ const updateProject = async (req, res) => {
   try {
     const { id } = req.params;
     const { title, description, technologies, imageUrl, link } = req.body;
-    const techList = Array.isArray(technologies) ? technologies : [];
+    const techList = Array.isArray(technologies)
+    ? technologies
+    : typeof technologies === 'string'
+      ? technologies.split(',').map(t => t.trim())
+      : [];
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ message: 'Invalid project ID' });
+  }
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ message: 'Invalid project ID' });
