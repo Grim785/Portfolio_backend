@@ -62,7 +62,7 @@ const updateProject = async (req, res) => {
 
     const updatedProject = await Project.findByIdAndUpdate(
       id,
-      { title, description, technologies, imageUrl, link },
+      { title, description, technologies:technologies.split(','), imageUrl, link },
       { new: true }
     );
 
