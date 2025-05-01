@@ -3,7 +3,6 @@ const app= express();
 const cors = require('cors');
 const mongoose = require('mongoose');
 const connectDB=require('./config/db');
-const socketService = require('./services/socket.service');
 const nodemailer = require('nodemailer')
 
 app.use(cors());
@@ -53,8 +52,7 @@ app.post('/api/contact', (req, res) => {
 
 connectDB(); // Connect to MongoDB
 
-
-const server = app.listen(process.env.PORT || 3000, () => {
+app.listen(process.env.PORT || 3000, () => {
     console.log(`Server running on port ${process.env.PORT || 3000}`);
   });
   
@@ -62,7 +60,3 @@ const server = app.listen(process.env.PORT || 3000, () => {
 const {createAdmin} = require('./createadmin');
 createAdmin(); // Tạo admin nếu chưa tồn tại
 
-socketService(server);
-
-const io = socketService(server); // Sửa: nhận lại io
-app.set('io', io);

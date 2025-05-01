@@ -15,9 +15,6 @@ const createProject = async (req, res) => {
 
     await newProject.save();
 
-    const io = req.app.get('io'); // Gửi sự kiện WebSocket
-    io.emit('projectAdded');
-
     res.status(201).json(newProject);
   } catch (error) {
     res.status(500).json({ message: 'Error creating project', error });
@@ -48,10 +45,6 @@ const deleteProject = async (req, res) => {
     if (!deletedProject) {
       return res.status(404).json({ message: 'Project not found' });
     }
-
-    const io = req.app.get('io');
-    io.emit('projectDeleted');
-
     res.status(200).json({ message: 'Project deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: 'Error deleting project', error: error.message });
@@ -76,9 +69,6 @@ const updateProject = async (req, res) => {
     if (!updatedProject) {
       return res.status(404).json({ message: 'Project not found' });
     }
-
-    const io = req.app.get('io');
-    io.emit('projectsUpdated');
 
     res.status(200).json(updatedProject);
   } catch (error) {
