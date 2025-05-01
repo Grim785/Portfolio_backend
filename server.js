@@ -62,5 +62,7 @@ const server = app.listen(process.env.PORT || 3000, () => {
 const {createAdmin} = require('./createadmin');
 createAdmin(); // Tạo admin nếu chưa tồn tại
 
+socketService(server);
+
 const io = socketService(server); // Sửa: nhận lại io
 app.set('io', io);
