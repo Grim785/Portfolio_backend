@@ -55,7 +55,6 @@ const updateProject = async (req, res) => {
   try {
     const { id } = req.params;
     const { title, description, technologies, imageUrl, link } = req.body;
-    technologies = technologies.split(',');
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ message: 'Invalid project ID' });
@@ -63,7 +62,7 @@ const updateProject = async (req, res) => {
 
     const updatedProject = await Project.findByIdAndUpdate(
       id,
-      { title, description, technologies, imageUrl, link },
+      { title, description, technologies:technologies.split(','), imageUrl, link },
       { new: true }
     );
 
