@@ -1,5 +1,5 @@
 const Project = require('../models/project.model');
-const mongoose = require('mongoose'); // Import mongoose để kiểm tra ObjectId
+const mongoose = require('mongoose');
 
 // Tạo dự án mới
 const createProject = async (req, res) => {
@@ -8,13 +8,17 @@ const createProject = async (req, res) => {
     const newProject = new Project({
       title,
       description,
-      technologies:technologies.split(','),
+      technologies: technologies.split(','),
       imageUrl,
       link
     });
 
-    await newProject.save();  // Lưu dự án vào cơ sở dữ liệu
-    res.status(201).json(newProject);  // Trả lại dự án mới được tạo
+    await newProject.save();
+
+    const io = req.app.get('io'); // Gửi sự kiện WebSocket
+    io.emit('projectAdded');
+
+    res.status(201).json(newProject);
   } catch (error) {
     res.status(500).json({ message: 'Error creating project', error });
   }
@@ -23,9 +27,8 @@ const createProject = async (req, res) => {
 // Lấy tất cả dự án
 const getAllProjects = async (req, res) => {
   try {
-    const projects = await Project.find(); 
-    console.log(projects) // Tìm tất cả dự án trong cơ sở dữ liệu
-    res.status(200).json(projects);  // Trả về danh sách dự án
+    const projects = await Project.find();
+    res.status(200).json(projects);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching projects', error });
   }
@@ -33,9 +36,9 @@ const getAllProjects = async (req, res) => {
 
 const deleteProject = async (req, res) => {
   try {
-    const { id } = req.params; // Lấy ID từ tham số URL
+    const { id } = req.params;
+    console.log("deteled")
 
-    // Kiểm tra ID có đúng chuẩn Mongo ObjectId không
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ message: 'Invalid project ID' });
     }
@@ -46,19 +49,20 @@ const deleteProject = async (req, res) => {
       return res.status(404).json({ message: 'Project not found' });
     }
 
+    const io = req.app.get('io');
+    io.emit('projectDeleted');
+
     res.status(200).json({ message: 'Project deleted successfully' });
   } catch (error) {
-    console.error("Error deleting project:", error);
     res.status(500).json({ message: 'Error deleting project', error: error.message });
   }
 };
 
 const updateProject = async (req, res) => {
   try {
-    const { id } = req.params; // Lấy ID từ tham số URL
-    const { title, description, technologies, imageUrl, link } = req.body; // Lấy dữ liệu từ body
+    const { id } = req.params;
+    const { title, description, technologies, imageUrl, link } = req.body;
 
-    // Kiểm tra ID có đúng chuẩn Mongo ObjectId không
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ message: 'Invalid project ID' });
     }
@@ -66,38 +70,45 @@ const updateProject = async (req, res) => {
     const updatedProject = await Project.findByIdAndUpdate(
       id,
       { title, description, technologies, imageUrl, link },
-      { new: true } // Trả về tài liệu đã cập nhật
+      { new: true }
     );
 
     if (!updatedProject) {
       return res.status(404).json({ message: 'Project not found' });
     }
 
-    res.status(200).json(updatedProject); // Trả về dự án đã cập nhật
+    const io = req.app.get('io');
+    io.emit('projectsUpdated');
+
+    res.status(200).json(updatedProject);
   } catch (error) {
-    console.error("Error updating project:", error);
     res.status(500).json({ message: 'Error updating project', error: error.message });
   }
 };
 
 const getProjectById = async (req, res) => {
   try {
-    const { id } = req.params; // Lấy ID từ tham số URL
+    const { id } = req.params;
 
-    // Kiểm tra ID có đúng chuẩn Mongo ObjectId không
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ message: 'Invalid project ID' });
     }
 
-    const project = await Project.findById(id); // Tìm dự án theo ID
+    const project = await Project.findById(id);
     if (!project) {
       return res.status(404).json({ message: 'Project not found' });
     }
-    return res.status(200).json(project); // Trả về dự án tìm thấy
+
+    return res.status(200).json(project);
   } catch (error) {
-    console.error("Error fetching project:", error);
     res.status(500).json({ message: 'Error fetching project', error: error.message });
   }
-}
+};
 
-module.exports = { createProject, getAllProjects, deleteProject, updateProject , getProjectById };
+module.exports = {
+  createProject,
+  getAllProjects,
+  deleteProject,
+  updateProject,
+  getProjectById
+};
