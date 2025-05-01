@@ -14,7 +14,7 @@ router.get('/', getAllProjects);
 router.delete('/:id', authMiddleware, deleteProject);
 
 // Route để cập nhật dự án theo ID
-router.put('/:id', authMiddleware, updateProject);
+router.put('/:id', updateProject);
 
 // Route để lấy dự án theo ID (nếu cần, có thể thêm vào sau này)
 router.get('/:id', authMiddleware, getProjectById);
